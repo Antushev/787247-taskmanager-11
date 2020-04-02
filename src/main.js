@@ -372,19 +372,28 @@ const render = (container, markup, position = `beforeend`) => {
   container.insertAdjacentHTML(position, markup);
 };
 
-render(mainMenu, siteMenuTemplate());
-render(mainPage, siteFilterTemplate());
-render(mainPage, siteBoardTemplate());
+const renderMainBlocks = () => {
+  render(mainMenu, siteMenuTemplate());
+  render(mainPage, siteFilterTemplate());
+  render(mainPage, siteBoardTemplate());
+};
+
+const renderBoard = () => {
+  render(mainBoard, siteBoardFilterTemplate());
+  render(mainBoard, siteBoardTasks());
+};
+
+const renderTasks = () => {
+  render(boardTasks, siteBoardFormTemplate());
+  for (let i = 0; i < TASKS_NUMBER; i++) {
+    render(boardTasks, siteCardTask());
+  }
+};
+
+renderMainBlocks();
 
 const mainBoard = document.querySelector(`.board`);
-
-render(mainBoard, siteBoardFilterTemplate());
-render(mainBoard, siteBoardTasks());
+renderBoard();
 
 const boardTasks = mainBoard.querySelector(`.board__tasks`);
-
-render(boardTasks, siteBoardFormTemplate());
-for (let i = 0; i < TASKS_NUMBER; i++) {
-  render(boardTasks, siteCardTask());
-}
-
+renderTasks();

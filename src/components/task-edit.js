@@ -166,7 +166,7 @@ const createTaskEditTemplate = (taskEdit) => {
             <div class="card__colors-inner">
               <h3 class="card__colors-title">Color</h3>
               <div class="card__colors-wrap">
-                ${generateColorsTemplate(COLORS, 'black')}
+                ${generateColorsTemplate(COLORS, `black`)}
               </div>
             </div>
           </div>

@@ -1,6 +1,45 @@
-const siteBoardFormTemplate = () => {
+import {COLORS, MONTHS} from './../const.js';
+
+const colorTemplate = (color, index, currentColor) => {
   return (
-    `<article class="card card--edit card--black">
+    `<input
+      type="radio"
+      id="color-${color}-${index}"
+      class="card__color-input card__color-input--${color} visually-hidden"
+      name="color"
+      value="${color}"
+      ${currentColor === color ? `checked` : ``}
+    />
+    <label
+      for="color-${color}-${index}"
+      class="card__color card__color--${color}"
+      >${color}</label
+    >`
+  );
+};
+
+const generateColorsTemplate = (colors, currentColor) => {
+  return (
+    colors.map((color, index) => {
+      return colorTemplate(color, index, currentColor);
+    }).join(``)
+  );
+};
+
+const createTaskEditTemplate = (taskEdit) => {
+  const {description, dueDate, color, repeatingDays} = taskEdit;
+  const isExpired = dueDate instanceof Date && dueDate < Date.now();
+  const isDateShowing = !!dueDate;
+
+  const date = isDateShowing ? `${dueDate.getDate()} ${MONTHS[dueDate.getMonth()]}` : ``;
+  const time = isDateShowing ? `${dueDate.getHours()}:${dueDate.getMinutes()}` : ``;
+
+  const isRepeatingTask = Object.values(repeatingDays).some(Boolean);
+  const repeatClass = isRepeatingTask ? `card--repeat` : ``;
+  const deadlineClass = isExpired ? `card--deadline` : ``;
+
+  return (
+    `<article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__color-bar">
@@ -15,7 +54,7 @@ const siteBoardFormTemplate = () => {
                 class="card__text"
                 placeholder="Start typing your text here..."
                 name="text"
-              >This is example of new task, you can set date and time.</textarea>
+              >${description}</textarea>
             </label>
           </div>
 
@@ -23,25 +62,28 @@ const siteBoardFormTemplate = () => {
             <div class="card__details">
               <div class="card__dates">
                 <button class="card__date-deadline-toggle" type="button">
-                  date: <span class="card__date-status">no</span>
+                  date: <span class="card__date-status">
+                            ${isDateShowing ? `yes` : `no`}
+                        </span>
                 </button>
-
-                <fieldset class="card__date-deadline" disabled>
+                ${isDateShowing ? `<fieldset class="card__date-deadline" disabled>
                   <label class="card__input-deadline-wrap">
                     <input
                       class="card__date"
                       type="text"
                       placeholder="23 September"
                       name="date"
+                      value="${date}:${time}"
                     />
                   </label>
-                </fieldset>
+                </fieldset>` : ``}
 
                 <button class="card__repeat-toggle" type="button">
-                  repeat:<span class="card__repeat-status">no</span>
+                  repeat:<span class="card__repeat-status">
+                        ${isRepeatingTask ? `yes` : `no`}
+                        </span>
                 </button>
-
-                <fieldset class="card__repeat-days" disabled>
+                ${isRepeatingTask ? `<fieldset class="card__repeat-days">
                   <div class="card__repeat-days-inner">
                     <input
                       class="visually-hidden card__repeat-day-input"
@@ -117,74 +159,14 @@ const siteBoardFormTemplate = () => {
                       >su</label
                     >
                   </div>
-                </fieldset>
+                </fieldset>` : ``}
               </div>
             </div>
 
             <div class="card__colors-inner">
               <h3 class="card__colors-title">Color</h3>
               <div class="card__colors-wrap">
-                <input
-                  type="radio"
-                  id="color-black-1"
-                  class="card__color-input card__color-input--black visually-hidden"
-                  name="color"
-                  value="black"
-                  checked
-                />
-                <label
-                  for="color-black-1"
-                  class="card__color card__color--black"
-                  >black</label
-                >
-                <input
-                  type="radio"
-                  id="color-yellow-1"
-                  class="card__color-input card__color-input--yellow visually-hidden"
-                  name="color"
-                  value="yellow"
-                />
-                <label
-                  for="color-yellow-1"
-                  class="card__color card__color--yellow"
-                  >yellow</label
-                >
-                <input
-                  type="radio"
-                  id="color-blue-1"
-                  class="card__color-input card__color-input--blue visually-hidden"
-                  name="color"
-                  value="blue"
-                />
-                <label
-                  for="color-blue-1"
-                  class="card__color card__color--blue"
-                  >blue</label
-                >
-                <input
-                  type="radio"
-                  id="color-green-1"
-                  class="card__color-input card__color-input--green visually-hidden"
-                  name="color"
-                  value="green"
-                />
-                <label
-                  for="color-green-1"
-                  class="card__color card__color--green"
-                  >green</label
-                >
-                <input
-                  type="radio"
-                  id="color-pink-1"
-                  class="card__color-input card__color-input--pink visually-hidden"
-                  name="color"
-                  value="pink"
-                />
-                <label
-                  for="color-pink-1"
-                  class="card__color card__color--pink"
-                  >pink</label
-                >
+                ${generateColorsTemplate(COLORS, 'black')}
               </div>
             </div>
           </div>
@@ -199,4 +181,4 @@ const siteBoardFormTemplate = () => {
   );
 };
 
-export {siteBoardFormTemplate};
+export {createTaskEditTemplate};

@@ -1,4 +1,4 @@
-const siteMenuTemplate = () => {
+const menu = () => {
   return (
     `<section class="control__btn-wrap">
           <input
@@ -31,4 +31,4 @@ const siteMenuTemplate = () => {
   );
 };
 
-export {siteMenuTemplate};
+export {menu};

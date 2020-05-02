@@ -1,4 +1,4 @@
-const siteBoardFilterTemplate = () => {
+const sort = () => {
   return (
     `
     <div class="board__filter-list">
@@ -9,4 +9,4 @@ const siteBoardFilterTemplate = () => {
   );
 };
 
-export {siteBoardFilterTemplate};
+export {sort};

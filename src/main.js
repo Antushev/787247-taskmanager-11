@@ -1,12 +1,22 @@
-import {siteMenuTemplate} from './components/siteMenuTemplate.js';
-import {siteFilterTemplate} from './components/siteFilterTemplate.js';
-import {siteBoardTemplate} from './components/siteBoardTemplate.js';
-import {siteBoardFilterTemplate} from './components/siteBoardFilterTemplate.js';
-import {siteBoardFormTemplate} from './components/siteBoardFormTemplate.js';
-import {siteBoardTasks} from './components/siteBoardTasks.js';
-import {siteCardTask} from './components/siteCardTask.js';
+import {taskBoard} from './components/task-board.js';
+import {createTaskEditTemplate} from './components/task-edit.js';
+import {createTaskTemplate} from './components/task.js';
+import {generateTask, generateTasks} from './mocks/task.js';
+import {createButtonLoadMore} from './components/load-more.js';
 
-const TASKS_NUMBER = 3;
+import {createFiltersTemplate} from './components/filters.js';
+import {generateFilters} from './mocks/filters.js';
+
+import {menu} from './components/menu.js';
+import {board} from './components/board.js';
+import {sort} from './components/sort.js';
+
+const TASKS_NUMBER = 20;
+const TASKS_LOAD_COUNT = 8;
+let tasksStartCount = 0;
+
+const tasks = generateTasks(TASKS_NUMBER);
+const taskEdit = generateTask();
 
 const mainPage = document.querySelector(`.main`);
 const mainMenu = mainPage.querySelector(`.main__control`);
@@ -15,28 +25,56 @@ const render = (container, markup, position = `beforeend`) => {
   container.insertAdjacentHTML(position, markup);
 };
 
-const renderMainBlocks = () => {
-  render(mainMenu, siteMenuTemplate());
-  render(mainPage, siteFilterTemplate());
-  render(mainPage, siteBoardTemplate());
+const renderMainBlocks = (mainMenuSite, mainPageSite) => {
+  const filters = generateFilters(tasks);
+
+  render(mainMenuSite, menu());
+  render(mainPageSite, createFiltersTemplate(filters));
+  render(mainPageSite, board());
 };
 
-const renderBoard = () => {
-  render(mainBoard, siteBoardFilterTemplate());
-  render(mainBoard, siteBoardTasks());
+const renderBoard = (mainBoard) => {
+  render(mainBoard, sort());
+  render(mainBoard, taskBoard());
 };
 
-const renderTasks = () => {
-  render(boardTasks, siteBoardFormTemplate());
-  for (let i = 0; i < TASKS_NUMBER; i++) {
-    render(boardTasks, siteCardTask());
-  }
+const renderTaskEdit = (taskEditBoard, boardTasks) => {
+  render(boardTasks, createTaskEditTemplate(taskEditBoard));
 };
 
-renderMainBlocks();
+const renderTasks = (allTasks, boardTasks) => {
+  const tasksRender = allTasks.slice(tasksStartCount, tasksStartCount + TASKS_LOAD_COUNT);
+  tasksRender.forEach((item) => {
+    render(boardTasks, createTaskTemplate(item));
+  });
 
-const mainBoard = document.querySelector(`.board`);
-renderBoard();
+  tasksStartCount = tasksStartCount + TASKS_LOAD_COUNT;
+};
 
-const boardTasks = mainBoard.querySelector(`.board__tasks`);
-renderTasks();
+const renderButtonLoadMore = (boardTasks) => {
+  render(boardTasks, createButtonLoadMore());
+};
+
+const init = () => {
+  renderMainBlocks(mainMenu, mainPage);
+
+  const mainBoard = document.querySelector(`.board`);
+  renderBoard(mainBoard);
+
+  const boardTasks = mainBoard.querySelector(`.board__tasks`);
+  renderTaskEdit(taskEdit, boardTasks);
+  renderTasks(tasks, boardTasks, tasksStartCount);
+
+  renderButtonLoadMore(mainBoard);
+  const buttonLoadMore = mainBoard.querySelector(`.load-more`);
+  const onButtonLoadMoreClick = () => {
+    renderTasks(tasks, boardTasks);
+    if (tasksStartCount >= TASKS_NUMBER) {
+      buttonLoadMore.remove();
+      buttonLoadMore.removeEventListener(`click`, onButtonLoadMoreClick);
+    }
+  };
+  buttonLoadMore.addEventListener(`click`, onButtonLoadMoreClick);
+};
+
+init();

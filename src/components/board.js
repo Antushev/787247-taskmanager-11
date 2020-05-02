@@ -1,7 +1,7 @@
-const siteBoardTemplate = () => {
+const board = () => {
   return (
     `<section class="board container"></section>`
   );
 };
 
-export {siteBoardTemplate};
+export {board};

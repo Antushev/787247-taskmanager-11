@@ -1,7 +1,7 @@
-const siteBoardTasks = () => {
+const taskBoard = () => {
   return (
     `<div class="board__tasks"></div>`
   );
 };
 
-export {siteBoardTasks};
+export {taskBoard};

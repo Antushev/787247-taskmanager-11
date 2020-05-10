@@ -1,4 +1,5 @@
 import {COLORS, MONTHS} from './../const.js';
+import {createElement} from './../utils.js';
 
 const colorTemplate = (color, index, currentColor) => {
   return (
@@ -181,4 +182,26 @@ const createTaskEditTemplate = (taskEdit) => {
   );
 };
 
-export {createTaskEditTemplate};
+export default class TaskEdit {
+  constructor(taskEdit) {
+    this._taskEdit = taskEdit;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTaskEditTemplate(this._taskEdit);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,4 +1,4 @@
-import {render, RenderPosition} from './utils.js';
+import {render} from './utils.js';
 
 import TaskBoardBlockComponent from './components/task-board.js';
 import TaskEditComponent from './components/task-edit.js';
@@ -10,10 +10,12 @@ import MenuComponent from './components/menu.js';
 import SortComponent from './components/sort.js';
 import FiltersComponent from './components/filters.js';
 
+import NoTasksComponent from './components/no-tasks.js';
+
 import {generateTasks} from './mocks/task.js';
 import {generateFilters} from './mocks/filters.js';
 
-const TASKS_NUMBER = 20;
+const TASKS_NUMBER = 0;
 const TASKS_LOAD_COUNT = 8;
 let tasksStartCount = 0;
 
@@ -25,9 +27,9 @@ const mainMenu = mainPage.querySelector(`.main__control`);
 const boardComponent = new BoardComponent();
 
 const renderMainBlocks = () => {
-  render(mainMenu, new MenuComponent().getElement(), RenderPosition.BEFOREEND);
-  render(mainPage, new FiltersComponent(filters).getElement(), RenderPosition.BEFOREEND);
-  render(mainPage, boardComponent.getElement(), RenderPosition.BEFOREEND);
+  render(mainMenu, new MenuComponent().getElement());
+  render(mainPage, new FiltersComponent(filters).getElement());
+  render(mainPage, boardComponent.getElement());
 };
 
 const renderTasks = (allTasks, boardTasks) => {
@@ -41,9 +43,17 @@ const renderTasks = (allTasks, boardTasks) => {
 };
 const renderBoard = (allTasks, boardMainComponent) => {
   const mainTasksBlock = boardMainComponent.getElement();
-  render(mainTasksBlock, new SortComponent().getElement(), RenderPosition.BEFOREEND);
-  render(mainTasksBlock, new TaskBoardBlockComponent().getElement(), RenderPosition.BEFOREEND);
-  render(mainTasksBlock, new ButtonLoadMoreComponent().getElement(), RenderPosition.BEFOREEND);
+  const isAllTasksArchive = tasks.every((task) => {
+    return task.isArchive;
+  });
+  if (isAllTasksArchive) {
+    render(mainTasksBlock, new NoTasksComponent().getElement());
+    return;
+  }
+
+  render(mainTasksBlock, new SortComponent().getElement());
+  render(mainTasksBlock, new TaskBoardBlockComponent().getElement());
+  render(mainTasksBlock, new ButtonLoadMoreComponent().getElement());
 
   const buttonLoadMore = mainTasksBlock.querySelector(`.load-more`);
 
@@ -96,7 +106,7 @@ const renderTask = (task, tasksList) => {
 
   buttonEditTask.addEventListener(`click`, onEditTaskToEdit);
 
-  render(tasksList, taskComponent.getElement(), RenderPosition.BEFOREEND);
+  render(tasksList, taskComponent.getElement());
 };
 
 const init = () => {

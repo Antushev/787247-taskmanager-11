@@ -43,10 +43,10 @@ const renderTasks = (allTasks, boardTasks) => {
 };
 const renderBoard = (allTasks, boardMainComponent) => {
   const mainTasksBlock = boardMainComponent.getElement();
-  const isAllTasksArchive = tasks.every((task) => {
+  const areAllTasksArchived = tasks.every((task) => {
     return task.isArchive;
   });
-  if (isAllTasksArchive) {
+  if (areAllTasksArchived) {
     render(mainTasksBlock, new NoTasksComponent().getElement());
     return;
   }

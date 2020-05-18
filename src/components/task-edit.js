@@ -198,6 +198,6 @@ export default class TaskEdit extends AbstractComponent {
   }
 
   removeSubmitClickHandler(handler) {
-    this.getElement().querySelector(`form`).removeEventListener(`click`, handler)
+    this.getElement().querySelector(`form`).removeEventListener(`click`, handler);
   }
 }

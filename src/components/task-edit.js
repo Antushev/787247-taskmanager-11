@@ -1,5 +1,5 @@
 import {COLORS, MONTHS} from './../const.js';
-import {createElement} from './../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const colorTemplate = (color, index, currentColor) => {
   return (
@@ -182,26 +182,22 @@ const createTaskEditTemplate = (taskEdit) => {
   );
 };
 
-export default class TaskEdit {
+export default class TaskEdit extends AbstractComponent {
   constructor(taskEdit) {
-    this._taskEdit = taskEdit;
+    super();
 
-    this._element = null;
+    this._taskEdit = taskEdit;
   }
 
   getTemplate() {
     return createTaskEditTemplate(this._taskEdit);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  setSubmitClickHandler(handler) {
+    this.getElement().querySelector(`form`).addEventListener(`click`, handler);
   }
 
-  removeElement() {
-    this._element = null;
+  removeSubmitClickHandler(handler) {
+    this.getElement().querySelector(`form`).removeEventListener(`click`, handler)
   }
 }

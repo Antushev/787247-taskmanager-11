@@ -1,4 +1,4 @@
-import {getRandomNumber, getRandomElementFromArray} from './../utils.js';
+import {getRandomNumber, getRandomElementFromArray} from '../utils/common.js';
 import {COLORS} from './../const.js';
 
 const DefaultRepeatingDays = {

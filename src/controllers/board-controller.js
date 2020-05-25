@@ -73,20 +73,21 @@ const sortTasks = (tasks, tasksDefault, sortType) => {
   return tasksDefault;
 };
 
-
 export default class BoardController {
   constructor(container) {
     this._container = container;
 
     this._taskBoardBlockComponent = new TaskBoardBlockComponent();
     this._sortComponent = new SortComponent();
+    this._loadMoreButtonComponent = new ButtonLoadMoreComponent();
   }
 
   render(tasks) {
     const tasksDefault = tasks.slice();
 
     render(this._container, this._sortComponent);
-    const onSortButtonClick = (evt) => {
+
+    this._sortComponent.setSortButtonClick((evt) => {
       const sortCurrent = this._sortComponent.getElement().dataset.sortCurrent;
       const sortType = evt.target.dataset.sortType;
       if (sortType !== sortCurrent) {
@@ -95,9 +96,7 @@ export default class BoardController {
         renderTasks(tasks, this._taskBoardBlockComponent.getElement());
         this._sortComponent.getElement().dataset.sortCurrent = sortType;
       }
-    };
-
-    this._sortComponent.setSortButtonClick(onSortButtonClick);
+    });
 
     const areAllTasksArchived = tasks.every((task) => {
       return task.isArchive;
@@ -109,18 +108,19 @@ export default class BoardController {
 
     render(this._container, this._taskBoardBlockComponent);
 
-    const loadMoreButtonComponent = new ButtonLoadMoreComponent();
-    render(this._container, loadMoreButtonComponent);
+
+    render(this._container, this._loadMoreButtonComponent);
 
     renderTasks(tasks, this._taskBoardBlockComponent.getElement());
 
     const onButtonLoadMoreClick = () => {
       renderTasks(tasks, this._taskBoardBlockComponent.getElement());
       if (tasksStartCount >= tasks.length) {
-        remove(loadMoreButtonComponent);
-        loadMoreButtonComponent.removeClickHandler(onButtonLoadMoreClick);
+        remove(this._loadMoreButtonComponent);
+        this._loadMoreButtonComponent.removeClickHandler(onButtonLoadMoreClick);
       }
     };
-    loadMoreButtonComponent.setClickHandler(onButtonLoadMoreClick);
+
+    this._loadMoreButtonComponent.setClickHandler(onButtonLoadMoreClick);
   }
 }

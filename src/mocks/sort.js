@@ -1,7 +1,7 @@
-const sorts = [
+const SORTS = [
   `DEFAULT`,
   `DATE up`,
   `DATE down`
 ];
 
-export {sorts};
+export {SORTS};

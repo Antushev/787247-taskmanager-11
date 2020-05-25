@@ -6,6 +6,8 @@ import ButtonLoadMoreComponent from '../components/load-more';
 import TaskComponent from '../components/task';
 import TaskEditComponent from '../components/task-edit';
 
+import {SortType} from '../mocks/sort.js';
+
 const TASKS_LOAD_COUNT = 8;
 let tasksStartCount = 0;
 
@@ -58,16 +60,26 @@ const renderTask = (task, tasksList) => {
   render(tasksList, taskComponent);
 };
 
+const sortTaskDateUp = (tasks) => {
+  return tasks.slice().sort((taskCurrent, taskNext) => {
+    return taskCurrent.dueDate - taskNext.dueDate;
+  });
+};
+
+const sortTaskDateDown = (tasks) => {
+  return tasks.slice().sort((taskCurrent, taskNext) => {
+    return taskNext.dueDate - taskCurrent.dueDate;
+  });
+};
+
 const sortTasks = (tasks, tasksDefault, sortType) => {
   tasksStartCount = 0;
-  if (sortType === `date-up`) {
-    return tasks.slice().sort((taskCurrent, taskNext) => {
-      return taskCurrent.dueDate - taskNext.dueDate;
-    });
-  } else if (sortType === `date-down`) {
-    return tasks.slice().sort((taskCurrent, taskNext) => {
-      return taskNext.dueDate - taskCurrent.dueDate;
-    });
+  if (sortType === SortType.DATEUP) {
+    return sortTaskDateUp(tasks);
+  }
+
+  if (sortType === SortType.DATEDOWN) {
+    return sortTaskDateDown(tasks);
   }
 
   return tasksDefault;

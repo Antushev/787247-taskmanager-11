@@ -4,4 +4,11 @@ const SORTS = [
   `DATE down`
 ];
 
-export {SORTS};
+const SortType = {
+  DEFAULT: `DEFAULT`,
+  DATEUP: `DATE up`,
+  DATEDOWN: `DATE down`
+};
+
+
+export {SORTS, SortType};

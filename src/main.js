@@ -18,7 +18,7 @@ const mainPage = document.querySelector(`.main`);
 const mainMenu = mainPage.querySelector(`.main__control`);
 const boardComponent = new BoardComponent();
 
-const boardController = new BoardController(boardComponent);
+const boardController = new BoardController(boardComponent.getElement());
 
 const renderMainBlocks = () => {
   render(mainMenu, new MenuComponent());

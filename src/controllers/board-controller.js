@@ -1,10 +1,10 @@
-import {remove, render, replace} from "../utils/render";
-import NoTasksComponent from "../components/no-tasks";
-import SortComponent from "../components/sort";
-import TaskBoardBlockComponent from "../components/task-board";
-import ButtonLoadMoreComponent from "../components/load-more";
-import TaskComponent from "../components/task";
-import TaskEditComponent from "../components/task-edit";
+import {remove, render, replace} from '../utils/render';
+import NoTasksComponent from '../components/no-tasks';
+import SortComponent from '../components/sort';
+import TaskBoardBlockComponent from '../components/task-board';
+import ButtonLoadMoreComponent from '../components/load-more';
+import TaskComponent from '../components/task';
+import TaskEditComponent from '../components/task-edit';
 
 const TASKS_LOAD_COUNT = 8;
 let tasksStartCount = 0;
@@ -17,36 +17,6 @@ const renderTasks = (allTasks, boardTasks) => {
   });
 
   tasksStartCount = tasksStartCount + TASKS_LOAD_COUNT;
-};
-
-const renderBoard = (allTasks, boardMainComponent) => {
-  const mainTasksBlock = boardMainComponent.getElement();
-  const areAllTasksArchived = allTasks.every((task) => {
-    return task.isArchive;
-  });
-  if (areAllTasksArchived) {
-    render(mainTasksBlock, new NoTasksComponent().getElement());
-    return;
-  }
-
-  render(mainTasksBlock, new SortComponent());
-
-  const boardTasks = new TaskBoardBlockComponent();
-  render(mainTasksBlock, boardTasks);
-
-  const loadMoreButtonComponent = new ButtonLoadMoreComponent();
-  render(mainTasksBlock, loadMoreButtonComponent);
-
-  renderTasks(allTasks, boardTasks.getElement());
-
-  const onButtonLoadMoreClick = () => {
-    renderTasks(allTasks, boardTasks);
-    if (tasksStartCount >= allTasks.length) {
-      remove(loadMoreButtonComponent);
-      loadMoreButtonComponent.removeClickHandler(onButtonLoadMoreClick);
-    }
-  };
-  loadMoreButtonComponent.setClickHandler(onButtonLoadMoreClick);
 };
 
 const renderTask = (task, tasksList) => {
@@ -88,12 +58,69 @@ const renderTask = (task, tasksList) => {
   render(tasksList, taskComponent);
 };
 
+const sortTasks = (tasks, tasksDefault, sortType) => {
+  tasksStartCount = 0;
+  if (sortType === `date-up`) {
+    return tasks.slice().sort((taskCurrent, taskNext) => {
+      return taskCurrent.dueDate - taskNext.dueDate;
+    });
+  } else if (sortType === `date-down`) {
+    return tasks.slice().sort((taskCurrent, taskNext) => {
+      return taskNext.dueDate - taskCurrent.dueDate;
+    });
+  }
+
+  return tasksDefault;
+};
+
+
 export default class BoardController {
   constructor(container) {
     this._container = container;
+
+    this._taskBoardBlockComponent = new TaskBoardBlockComponent();
+    this._sortComponent = new SortComponent();
   }
 
   render(tasks) {
-    renderBoard(tasks, this._container);
+    const tasksDefault = tasks.slice();
+
+    render(this._container, this._sortComponent);
+    const onSortButtonClick = (evt) => {
+      const sortCurrent = this._sortComponent.getElement().dataset.sortCurrent;
+      const sortType = evt.target.dataset.sortType;
+      if (sortType !== sortCurrent) {
+        tasks = sortTasks(tasks, tasksDefault, sortType);
+        this._taskBoardBlockComponent.getElement().innerHTML = ``;
+        renderTasks(tasks, this._taskBoardBlockComponent.getElement());
+        this._sortComponent.getElement().dataset.sortCurrent = sortType;
+      }
+    };
+
+    this._sortComponent.setSortButtonClick(onSortButtonClick);
+
+    const areAllTasksArchived = tasks.every((task) => {
+      return task.isArchive;
+    });
+    if (areAllTasksArchived) {
+      render(this._container, new NoTasksComponent().getElement());
+      return;
+    }
+
+    render(this._container, this._taskBoardBlockComponent);
+
+    const loadMoreButtonComponent = new ButtonLoadMoreComponent();
+    render(this._container, loadMoreButtonComponent);
+
+    renderTasks(tasks, this._taskBoardBlockComponent.getElement());
+
+    const onButtonLoadMoreClick = () => {
+      renderTasks(tasks, this._taskBoardBlockComponent.getElement());
+      if (tasksStartCount >= tasks.length) {
+        remove(loadMoreButtonComponent);
+        loadMoreButtonComponent.removeClickHandler(onButtonLoadMoreClick);
+      }
+    };
+    loadMoreButtonComponent.setClickHandler(onButtonLoadMoreClick);
   }
 }

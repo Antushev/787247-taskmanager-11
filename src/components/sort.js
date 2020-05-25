@@ -1,11 +1,20 @@
 import AbstractComponent from './abstract-component.js';
+import {sorts} from '../mocks/sort.js';
+
+const createSortItem = (sortItem) => {
+  return `<a href="#" class="board__filter" data-sort-type="${sortItem.replace(` `, `-`).toLowerCase()}">${sortItem}</a>`;
+};
+
+const createSortItems = (allSorts) => {
+  return allSorts.map((sortItem) => {
+    return createSortItem(sortItem);
+  }).join(``);
+};
 
 const createSortTemplate = () => {
   return (
-    `<div class="board__filter-list">
-      <a href="#" class="board__filter" data-sort-type="default">SORT BY DEFAULT</a>
-      <a href="#" class="board__filter" data-sort-type="date-up">SORT BY DATE up</a>
-      <a href="#" class="board__filter" data-sort-type="date-down">SORT BY DATE down</a>
+    `<div class="board__filter-list" data-sort-current="default">
+        ${createSortItems(sorts)}
     </div>`
   );
 };
@@ -13,5 +22,9 @@ const createSortTemplate = () => {
 export default class Sort extends AbstractComponent {
   getTemplate() {
     return createSortTemplate();
+  }
+
+  setSortButtonClick(handler) {
+    this.getElement().addEventListener(`click`, handler);
   }
 }

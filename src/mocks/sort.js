@@ -5,9 +5,9 @@ const SORTS = [
 ];
 
 const SortType = {
-  DEFAULT: `DEFAULT`,
-  DATEUP: `DATE up`,
-  DATEDOWN: `DATE down`
+  DEFAULT: `default`,
+  DATEUP: `date-up`,
+  DATEDOWN: `date-down`
 };
 
 

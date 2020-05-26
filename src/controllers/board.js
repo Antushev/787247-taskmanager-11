@@ -1,63 +1,27 @@
-import {remove, render, replace} from '../utils/render';
+import {remove, render} from '../utils/render';
+
 import NoTasksComponent from '../components/no-tasks';
 import SortComponent from '../components/sort';
 import TaskBoardBlockComponent from '../components/task-board';
 import ButtonLoadMoreComponent from '../components/load-more';
-import TaskComponent from '../components/task';
-import TaskEditComponent from '../components/task-edit';
+
+import TaskController from './task.js';
 
 import {SortType} from '../mocks/sort.js';
 
 const TASKS_LOAD_COUNT = 8;
 let tasksStartCount = 0;
 
-const renderTasks = (allTasks, boardTasks) => {
-  const tasksRender = allTasks.slice(tasksStartCount, tasksStartCount + TASKS_LOAD_COUNT);
-
-  tasksRender.forEach((task) => {
-    renderTask(task, boardTasks);
-  });
-
+const renderTasks = (tasks, boardTasks, onDataChange, onViewChange) => {
+  const tasksRender = tasks.slice(tasksStartCount, tasksStartCount + TASKS_LOAD_COUNT);
   tasksStartCount = tasksStartCount + TASKS_LOAD_COUNT;
-};
 
-const renderTask = (task, tasksList) => {
-  const taskComponent = new TaskComponent(task);
-  const taskEditComponent = new TaskEditComponent(task);
+  return tasksRender.map((task) => {
+    const taskController = new TaskController(boardTasks, onDataChange, onViewChange);
+    taskController.render(task);
 
-  const replaceTaskToEdit = () => {
-    replace(taskEditComponent, taskComponent);
-  };
-  const replaceEditToTask = () => {
-    replace(taskComponent, taskEditComponent);
-  };
-
-  const onEscapeKeyDown = (evt) => {
-    const isEscape = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscape) {
-      replaceEditToTask();
-
-      document.removeEventListener(`keydown`, onEscapeKeyDown);
-    }
-  };
-  const onButtonSubmitClick = () => {
-    replaceEditToTask();
-
-    document.removeEventListener(`keydown`, onEscapeKeyDown);
-    taskEditComponent.removeSubmitClickHandler(onButtonSubmitClick);
-    taskComponent.setEditClickHandler(onEditTaskToEdit);
-  };
-  const onEditTaskToEdit = () => {
-    replaceTaskToEdit();
-
-    document.addEventListener(`keydown`, onEscapeKeyDown);
-    taskEditComponent.setSubmitClickHandler(onButtonSubmitClick);
-  };
-
-  taskComponent.setEditClickHandler(onEditTaskToEdit);
-
-  render(tasksList, taskComponent);
+    return taskController;
+  });
 };
 
 const sortTaskDateUp = (tasks) => {
@@ -85,17 +49,24 @@ const sortTasks = (tasks, tasksDefault, sortType) => {
   return tasksDefault;
 };
 
-export default class BoardController {
+export default class Board {
   constructor(container) {
     this._container = container;
+    this._tasks = [];
+    this._showingTaskControllers = [];
 
     this._taskBoardBlockComponent = new TaskBoardBlockComponent();
     this._sortComponent = new SortComponent();
     this._loadMoreButtonComponent = new ButtonLoadMoreComponent();
+
+    this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   render(tasks) {
-    const tasksDefault = tasks.slice();
+    this._tasks = tasks;
+
+    const tasksDefault = this._tasks.slice();
 
     render(this._container, this._sortComponent);
 
@@ -103,14 +74,15 @@ export default class BoardController {
       const sortCurrent = this._sortComponent.getElement().dataset.sortCurrent;
       const sortType = evt.target.dataset.sortType;
       if (sortType !== sortCurrent) {
-        tasks = sortTasks(tasks, tasksDefault, sortType);
+        this._tasks = sortTasks(this._tasks, tasksDefault, sortType);
         this._taskBoardBlockComponent.getElement().innerHTML = ``;
-        renderTasks(tasks, this._taskBoardBlockComponent.getElement());
+        this._showingTaskControllers = renderTasks(this._tasks, this._taskBoardBlockComponent.getElement(),
+            this._onDataChange, this._onViewChange);
         this._sortComponent.getElement().dataset.sortCurrent = sortType;
       }
     });
 
-    const areAllTasksArchived = tasks.every((task) => {
+    const areAllTasksArchived = this._tasks.every((task) => {
       return task.isArchive;
     });
     if (areAllTasksArchived) {
@@ -123,16 +95,42 @@ export default class BoardController {
 
     render(this._container, this._loadMoreButtonComponent);
 
-    renderTasks(tasks, this._taskBoardBlockComponent.getElement());
+    this._showingTaskControllers = renderTasks(
+        this._tasks,
+        this._taskBoardBlockComponent.getElement(),
+        this._onDataChange,
+        this._onViewChange);
 
     const onButtonLoadMoreClick = () => {
-      renderTasks(tasks, this._taskBoardBlockComponent.getElement());
-      if (tasksStartCount >= tasks.length) {
+      const newTasks = renderTasks(this._tasks,
+          this._taskBoardBlockComponent.getElement(),
+          this._onDataChange,
+          this._onViewChange
+      );
+      this._showingTaskControllers = this._showingTaskControllers.concat(newTasks);
+
+      if (tasksStartCount >= this._tasks.length) {
         remove(this._loadMoreButtonComponent);
         this._loadMoreButtonComponent.removeClickHandler(onButtonLoadMoreClick);
       }
     };
 
     this._loadMoreButtonComponent.setClickHandler(onButtonLoadMoreClick);
+  }
+
+  _onViewChange() {
+    this._showingTaskControllers.forEach((task) => task.setDefaultView());
+  }
+
+  _onDataChange(taskController, oldData, newData) {
+    const index = this._tasks.findIndex((task) => task === oldData);
+
+    if (index === -1) {
+      return;
+    }
+
+    this._tasks = [].concat(this._tasks.slice(0, index), newData, this._tasks.slice(index + 1));
+
+    taskController.render(this._tasks[index]);
   }
 }

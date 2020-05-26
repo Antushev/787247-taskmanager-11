@@ -1,7 +1,14 @@
-const sorts = [
+const SORTS = [
   `DEFAULT`,
   `DATE up`,
   `DATE down`
 ];
 
-export {sorts};
+const SortType = {
+  DEFAULT: `default`,
+  DATEUP: `date-up`,
+  DATEDOWN: `date-down`
+};
+
+
+export {SORTS, SortType};

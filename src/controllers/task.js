@@ -1,7 +1,8 @@
-import {render, replace} from "../utils/render";
+import {Keys} from '../utils/common.js';
+import {render, replace} from '../utils/render';
 
-import TaskComponent from "../components/task";
-import TaskEditComponent from "../components/task-edit";
+import TaskComponent from '../components/task';
+import TaskEditComponent from '../components/task-edit';
 
 const Mode = {
   DEFAULT: `default`,
@@ -83,9 +84,9 @@ export default class TaskController {
   }
 
   _onEscapeKeyDown(evt) {
-    const isEscape = evt.key === `Escape` || evt.key === `Esc`;
+    const isEscapePressed = evt.key === Keys.ESCAPE || evt.key === Keys.ESC;
 
-    if (isEscape) {
+    if (isEscapePressed) {
       this._replaceEditToTask();
 
       document.removeEventListener(`keydown`, this._onEscapeKeyDown);

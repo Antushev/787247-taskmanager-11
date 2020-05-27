@@ -7,7 +7,7 @@ import ButtonLoadMoreComponent from '../components/load-more';
 
 import TaskController from './task.js';
 
-import {SortType} from '../mocks/sort.js';
+import {SortType} from './../utils/common.js';
 
 const TASKS_LOAD_COUNT = 8;
 let tasksStartCount = 0;
@@ -38,11 +38,11 @@ const sortTaskDateDown = (tasks) => {
 
 const sortTasks = (tasks, tasksDefault, sortType) => {
   tasksStartCount = 0;
-  if (sortType === SortType.DATEUP) {
+  if (sortType === SortType.DATE_UP) {
     return sortTaskDateUp(tasks);
   }
 
-  if (sortType === SortType.DATEDOWN) {
+  if (sortType === SortType.DATE_DOWN) {
     return sortTaskDateDown(tasks);
   }
 
